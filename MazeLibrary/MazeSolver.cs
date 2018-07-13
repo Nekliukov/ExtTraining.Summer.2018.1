@@ -11,6 +11,8 @@ namespace MazeLibrary
         private int step = 1;
         private bool finish = false;
         #endregion
+
+        #region Public AIP
         /// <summary>
         /// Initializes a new instance of the <see cref="MazeSolver"/> class.
         /// </summary>
@@ -49,7 +51,6 @@ namespace MazeLibrary
             Copy2dArray(mazeModel, maze);
         }
 
-
         public int[,] MazeWithPass() { return maze; }
 
         /// <summary>
@@ -57,10 +58,14 @@ namespace MazeLibrary
         /// </summary>
         public void PassMaze()
         {
-            MakeStep(startX, startY, 0);
+            int finish = FindFinishBorder();
+            MakeStep(startX, startY, finish);
             ChangeToZero();
         }
 
+        #endregion
+
+        #region Private API
         /// <summary>
         /// Recursive method to make every step
         /// </summary>
@@ -69,44 +74,57 @@ namespace MazeLibrary
         /// <param name="finishSide">The finish side.</param>
         private void MakeStep(int x, int y, int finishSide)
         {
-            if (y == finishSide && maze[x, y] == 0)
+            if ((x == finishSide | y == finishSide) && maze[x, y] == 0 && y != startY)
             {
-                // finish has been founded
+                // Finish has been found
                 maze[x, y] = step++;
                 finish = true;
             }
+            // All returns after ifs needs to avoid unnecessary operations
+            // during the recursive down
+            if (finish) return;
 
             if (x != maze.GetLength(0) - 1 && maze[x + 1, y] == 0)
             {
                 maze[x, y] = step++;
                 MakeStep(x + 1, y, finishSide);
             }
+            if (finish) return;
 
             if (x != 0 && maze[x - 1, y] == 0)
             {
                 maze[x, y] = step++;
                 MakeStep(x - 1, y, finishSide);
             }
+            if (finish) return;
 
             if (y + 1 != maze.GetLength(1) && maze[x, y + 1] == 0)
             {
                 maze[x, y] = step++;
                 MakeStep(x, y + 1, finishSide);
             }
+            if (finish) return;
 
             if (y != 0 && maze[x, y - 1] == 0)
             {
                 maze[x, y] = step++;
                 MakeStep(x, y - 1, finishSide);
             }
+            if (finish) return;
 
+            //decrease accumulator in case of recursive down
             step -= 1;
             if (!finish)
             {
+                // -2 needs to match points that were passed by our alorithm
+                // This points should be not euqal to -1 in order to change them on 0 later
                 maze[x, y] = -2;
             }
         }
 
+        /// <summary>
+        /// Changes our temp -2 point on 0
+        /// </summary>
         private void ChangeToZero()
         {
             for (int i = 0; i < maze.GetLength(0); i++)
@@ -121,6 +139,13 @@ namespace MazeLibrary
             }
         }
 
+        /// <summary>
+        /// Determines whether [is finish exists] [the specified maze model].
+        /// </summary>
+        /// <param name="mazeModel">The maze model.</param>
+        /// <returns>
+        ///   <c>true</c> if [is finish exists] [the specified maze model]; otherwise, <c>false</c>.
+        /// </returns>
         private bool IsFinishExists(int[,] mazeModel)
         {
             for (int i = 0; i < mazeModel.GetLength(0); i++)
@@ -142,6 +167,34 @@ namespace MazeLibrary
             return false;
         }
 
+        /// <summary>
+        /// Finds the finish border.
+        /// </summary>
+        /// <returns>Max index of finish border in matrix</returns>
+        private int FindFinishBorder()
+        {
+            for (int i = 0; i < maze.GetLength(0); i++)
+            {
+                if (maze[i, 0] == 0 && i != startX)
+                {
+                    return 0;
+                }
+
+                if (maze[i, maze.GetLength(1) - 1] == 0 && i != startX)
+                {
+                    return maze.GetLength(0) - 1;
+                }
+            }
+
+            return 0;
+        }
+
+        /// <summary>
+        /// Returns copy of input array in order to avoid data changing
+        /// by refference
+        /// </summary>
+        /// <param name="from">From.</param>
+        /// <param name="to">To.</param>
         private void Copy2dArray(int[,] from, int[,] to)
         {
             for (int i = 0; i < from.GetLength(0); i++)
@@ -152,5 +205,6 @@ namespace MazeLibrary
                 }
             }
         }
+        #endregion
     }
 }

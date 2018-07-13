@@ -134,10 +134,9 @@ namespace MazeLibrary.Tests
                 MazeSolver solver = new MazeSolver(sourceData[i], startXs[i], startYs[i]);
 
                 solver.PassMaze();
-                CollectionAssert.AreEqual(solver.MazeWithPass(), result[i]);
                 if (!MatrixAreEquals(solver.MazeWithPass(), result[i]))
                 {
-                    throw new ArgumentException("Matrix are not equal!");
+                    Assert.Fail("Matrix are not equal");
                 }
             }
         }
