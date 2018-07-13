@@ -6,9 +6,9 @@ namespace MazeLibrary.Tests
     [TestFixture]
     public class MazeSolverTests
     {
-        private readonly int[] startXs = { 1, 0, 3, 0 };
+        private readonly int[] startXs = { 3, 0, 1, 0 };
 
-        private readonly int[] startYs = { 0, 1, 5, 4 };
+        private readonly int[] startYs = { 5, 4, 0, 1 };
 
         private readonly int[][,] sourceData = new int[][,]
         {
@@ -66,7 +66,7 @@ namespace MazeLibrary.Tests
         {
             new int[,]
             {
-                { -1, -1, -1, -1, -1, -1 },
+                { -1, -1, -1, -1, -1, -1 },  
                 { 10,  9,  0, -1,  0, -1 },
                 { -1,  8, -1, -1,  0, -1 },
                 { -1,  7, -1,  3,  2,  1 },
@@ -130,19 +130,33 @@ namespace MazeLibrary.Tests
         public void PassMaze_SuccessfulTests()
         {
             for (int i = 0; i < sourceData.Length; i++)
-            {
+            {               
                 MazeSolver solver = new MazeSolver(sourceData[i], startXs[i], startYs[i]);
 
                 solver.PassMaze();
-
+                CollectionAssert.AreEqual(solver.MazeWithPass(), result[i]);
                 if (!MatrixAreEquals(solver.MazeWithPass(), result[i]))
                 {
-                    //TODO
+                    throw new ArgumentException("Matrix are not equal!");
                 }
             }
         }
 
-        private static bool MatrixAreEquals(int[,] lhs, int[,] rhs) => throw new NotImplementedException();
+        private static bool MatrixAreEquals(int[,] lhs, int[,] rhs)
+        {
+            for (int i = 0; i < lhs.GetLength(0); i++)
+            {
+                for (int j = 0; j < lhs.GetLength(0); j++)
+                {
+                    if (lhs[i,j] != rhs[i, j])
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
 
     }
 }
